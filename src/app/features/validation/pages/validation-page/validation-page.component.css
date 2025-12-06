@@ -1,0 +1,36 @@
+.validation-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.page-header {
+  margin-bottom: 2rem;
+}
+
+.page-content {
+  display: grid;
+  gap: 2rem;
+}
+
+@media (min-width: 1024px) {
+  .page-content {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.form-section,
+.result-section {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

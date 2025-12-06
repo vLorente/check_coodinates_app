@@ -1,0 +1,170 @@
+<div class="history-container">
+  <div class="history-header">
+    <h2 class="text-2xl font-bold text-gray-900">Historial de Validaciones</h2>
+    <p class="text-sm text-gray-600 mt-1">
+      @if (hasValidations()) {
+        {{ validations().length }} validación{{ validations().length !== 1 ? 'es' : '' }} registrada{{ validations().length !== 1 ? 's' : '' }}
+      } @else {
+        No hay validaciones registradas
+      }
+    </p>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p class="text-gray-600">Cargando validaciones...</p>
+    </div>
+  } @else if (!hasValidations()) {
+    <div class="empty-state">
+      <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+      <h3 class="text-lg font-medium text-gray-900 mb-2">Sin validaciones</h3>
+      <p class="text-gray-600">Todavía no has realizado ninguna validación de coordenadas.</p>
+    </div>
+  } @else {
+    <!-- Desktop Table View -->
+    <div class="hidden md:block overflow-x-auto">
+      <table class="history-table">
+        <thead>
+          <tr>
+            <th>Estado</th>
+            <th>Dirección</th>
+            <th>Coordenadas</th>
+            <th>Distancia</th>
+            <th>Fecha</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (validation of validations(); track validation.id) {
+            <tr
+              (click)="handleSelectValidation(validation)"
+              class="cursor-pointer hover:bg-gray-50 transition-colors"
+            >
+              <td>
+                @if (validation.isValid) {
+                  <span class="status-badge valid">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Válida
+                  </span>
+                } @else {
+                  <span class="status-badge invalid">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    Inválida
+                  </span>
+                }
+              </td>
+              <td>
+                <div class="text-sm">
+                  <div class="font-medium text-gray-900">{{ formatAddress(validation.address) }}</div>
+                  <div class="text-gray-500">{{ validation.address.postalCode }}</div>
+                </div>
+              </td>
+              <td>
+                <div class="text-xs font-mono text-gray-600">
+                  {{ validation.inputCoordinates.latitude.toFixed(4) }}, {{ validation.inputCoordinates.longitude.toFixed(4) }}
+                </div>
+              </td>
+              <td>
+                <span class="font-medium text-blue-600">{{ formatDistance(validation.distance) }}</span>
+              </td>
+              <td>
+                <span class="text-sm text-gray-600">{{ formatDate(validation.timestamp) }}</span>
+              </td>
+              <td>
+                <div class="flex gap-2">
+                  <button
+                    (click)="handleSelectValidation(validation)"
+                    class="action-button view"
+                    title="Ver en mapa"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                    </svg>
+                  </button>
+                  <button
+                    (click)="handleDeleteValidation(validation.id, $event)"
+                    class="action-button delete"
+                    title="Eliminar"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Mobile Card View -->
+    <div class="md:hidden space-y-4">
+      @for (validation of validations(); track validation.id) {
+        <div
+          (click)="handleSelectValidation(validation)"
+          class="history-card"
+        >
+          <div class="flex items-start justify-between mb-3">
+            @if (validation.isValid) {
+              <span class="status-badge valid">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                Válida
+              </span>
+            } @else {
+              <span class="status-badge invalid">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                Inválida
+              </span>
+            }
+            <button
+              (click)="handleDeleteValidation(validation.id, $event)"
+              class="action-button delete"
+              title="Eliminar"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
+          </div>
+
+          <div class="space-y-2">
+            <div>
+              <p class="text-xs text-gray-500 mb-1">Dirección</p>
+              <p class="text-sm font-medium text-gray-900">{{ formatAddress(validation.address) }}</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <p class="text-xs text-gray-500 mb-1">Distancia</p>
+                <p class="text-sm font-semibold text-blue-600">{{ formatDistance(validation.distance) }}</p>
+              </div>
+              <div>
+                <p class="text-xs text-gray-500 mb-1">Fecha</p>
+                <p class="text-sm text-gray-700">{{ formatDate(validation.timestamp) }}</p>
+              </div>
+            </div>
+
+            <div>
+              <p class="text-xs text-gray-500 mb-1">Coordenadas</p>
+              <p class="text-xs font-mono text-gray-600">
+                {{ validation.inputCoordinates.latitude.toFixed(4) }}, {{ validation.inputCoordinates.longitude.toFixed(4) }}
+              </p>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

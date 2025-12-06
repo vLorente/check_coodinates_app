@@ -1,0 +1,67 @@
+<div class="route-container">
+  <div class="map-wrapper" [style.height]="height()">
+    <google-map
+      width="100%"
+      [height]="height()"
+      [options]="mapOptions()">
+
+      @if (addressMarker()) {
+        <map-marker
+          [position]="addressMarker()!"
+          [options]="addressMarkerOptions()" />
+      }
+
+      @if (inputMarker()) {
+        <map-marker
+          [position]="inputMarker()!"
+          [options]="inputMarkerOptions()" />
+      }
+
+      @if (showRoute() && routePath().length > 0) {
+        <map-polyline
+          [path]="routePath()"
+          [options]="polylineOptions()" />
+      }
+    </google-map>
+
+    @if (loading()) {
+      <div class="loading-overlay">
+        <div class="spinner"></div>
+        <p>Calculando ruta...</p>
+      </div>
+    }
+  </div>
+
+  @if (routeInfo()) {
+    <div class="route-info">
+      <h3 class="route-info-title">Información de la Ruta</h3>
+      <div class="route-stats">
+        <div class="stat-item">
+          <span class="stat-label">Distancia:</span>
+          <span class="stat-value">{{ routeInfo()!.distance }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Tiempo estimado:</span>
+          <span class="stat-value">{{ routeInfo()!.duration }}</span>
+        </div>
+      </div>
+    </div>
+  }
+
+  <div class="map-legend">
+    <div class="legend-item">
+      <span class="marker-dot blue"></span>
+      <span>Dirección geocodificada</span>
+    </div>
+    <div class="legend-item">
+      <span class="marker-dot red"></span>
+      <span>Coordenadas ingresadas</span>
+    </div>
+    @if (showRoute()) {
+      <div class="legend-item">
+        <span class="route-line"></span>
+        <span>Ruta</span>
+      </div>
+    }
+  </div>
+</div>

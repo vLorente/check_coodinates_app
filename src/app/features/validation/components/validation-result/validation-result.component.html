@@ -1,0 +1,109 @@
+<div class="validation-result-card">
+  <!-- Header with status -->
+  <div class="result-header" [class.valid]="result().isValid" [class.invalid]="!result().isValid">
+    <div class="flex items-center gap-3">
+      @if (result().isValid) {
+        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <div>
+          <h3 class="text-lg font-semibold text-green-900">Coordenadas Válidas</h3>
+          <p class="text-sm text-green-700">Las coordenadas corresponden a la dirección</p>
+        </div>
+      } @else {
+        <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <div>
+          <h3 class="text-lg font-semibold text-red-900">Coordenadas No Válidas</h3>
+          <p class="text-sm text-red-700">Las coordenadas NO corresponden a la dirección</p>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="result-content">
+    <!-- Message -->
+    <div class="mb-6">
+      <p class="text-gray-700">{{ result().message }}</p>
+    </div>
+
+    <!-- Details Grid -->
+    <div class="details-grid">
+      <!-- Address -->
+      <div class="detail-item">
+        <div class="detail-label">
+          <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <span>Dirección</span>
+        </div>
+        <p class="detail-value">{{ addressFormatted() }}</p>
+      </div>
+
+      <!-- Address Coordinates -->
+      <div class="detail-item">
+        <div class="detail-label">
+          <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+          </svg>
+          <span>Coordenadas de la Dirección</span>
+        </div>
+        <p class="detail-value font-mono">
+          {{ result().addressCoordinates.latitude.toFixed(6) }}, {{ result().addressCoordinates.longitude.toFixed(6) }}
+        </p>
+      </div>
+
+      <!-- Input Coordinates -->
+      <div class="detail-item">
+        <div class="detail-label">
+          <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+          </svg>
+          <span>Coordenadas Ingresadas</span>
+        </div>
+        <p class="detail-value font-mono">
+          {{ result().inputCoordinates.latitude.toFixed(6) }}, {{ result().inputCoordinates.longitude.toFixed(6) }}
+        </p>
+      </div>
+
+      <!-- Distance -->
+      <div class="detail-item">
+        <div class="detail-label">
+          <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+          </svg>
+          <span>Distancia</span>
+        </div>
+        <p class="detail-value font-semibold text-blue-600">{{ distanceFormatted() }}</p>
+      </div>
+
+      <!-- Timestamp -->
+      <div class="detail-item">
+        <div class="detail-label">
+          <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>Fecha y Hora</span>
+        </div>
+        <p class="detail-value">{{ timestampFormatted() }}</p>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="mt-6 pt-6 border-t border-gray-200">
+      <button
+        type="button"
+        (click)="handleViewMap()"
+        class="px-4 py-2 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition-colors flex items-center gap-2"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+        </svg>
+        Ver en Mapa
+      </button>
+    </div>
+  </div>
+</div>

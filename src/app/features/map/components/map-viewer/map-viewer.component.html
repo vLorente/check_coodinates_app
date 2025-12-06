@@ -1,0 +1,34 @@
+<div class="map-container" [style.height]="height()">
+  <google-map
+    width="100%"
+    [height]="height()"
+    [options]="mapOptions()">
+
+    @if (addressMarker()) {
+      <map-marker
+        [position]="addressMarker()!"
+        [options]="addressMarkerOptions()"
+        (mapClick)="handleAddressMarkerClick()" />
+    }
+
+    @if (inputMarker()) {
+      <map-marker
+        [position]="inputMarker()!"
+        [options]="inputMarkerOptions()"
+        (mapClick)="handleInputMarkerClick()" />
+    }
+  </google-map>
+</div>
+
+@if (validationResult()) {
+  <div class="map-legend">
+    <div class="legend-item">
+      <span class="marker-dot blue"></span>
+      <span>Dirección geocodificada</span>
+    </div>
+    <div class="legend-item">
+      <span class="marker-dot red"></span>
+      <span>Coordenadas ingresadas</span>
+    </div>
+  </div>
+}
