@@ -17,9 +17,11 @@ export class ValidationFormComponent {
   // Signals
   submitting = signal(false);
   errorMessage = signal<string | null>(null);
+  addressMode = signal<'detailed' | 'single'>('detailed');
 
   // Reactive Form
   validationForm = this.fb.group({
+    singleLineAddress: [''],
     address: this.fb.group({
       street: ['', [Validators.required, Validators.minLength(3)]],
       city: ['', [Validators.required, Validators.minLength(2)]],
@@ -43,9 +45,15 @@ export class ValidationFormComponent {
       this.errorMessage.set(null);
 
       const formValue = this.validationForm.value;
+      let address: string;
 
-      // Construir dirección completa para búsqueda en Google Maps
-      const address = `${formValue.address?.street}, ${formValue.address?.city}, ${formValue.address?.postalCode}, ${formValue.address?.country}`;
+      // Determinar la dirección según el modo seleccionado
+      if (this.addressMode() === 'single') {
+        address = formValue.singleLineAddress || '';
+      } else {
+        address = `${formValue.address?.street}, ${formValue.address?.city}, ${formValue.address?.postalCode}, ${formValue.address?.country}`;
+      }
+
       const lat = formValue.coordinates?.latitude || '0';
       const lng = formValue.coordinates?.longitude || '0';
 
@@ -56,6 +64,7 @@ export class ValidationFormComponent {
 
       this.onValidationComplete.emit();
       this.validationForm.reset({
+        singleLineAddress: '',
         address: { country: 'España' },
         coordinates: {}
       });
@@ -68,10 +77,38 @@ export class ValidationFormComponent {
 
   onClear(): void {
     this.validationForm.reset({
+      singleLineAddress: '',
       address: { country: 'España' },
       coordinates: {}
     });
     this.errorMessage.set(null);
+  }
+
+  toggleAddressMode(mode: 'detailed' | 'single'): void {
+    this.addressMode.set(mode);
+    
+    // Actualizar validadores según el modo
+    const singleLineControl = this.validationForm.get('singleLineAddress');
+    const addressGroup = this.validationForm.get('address');
+
+    if (mode === 'single') {
+      singleLineControl?.setValidators([Validators.required, Validators.minLength(5)]);
+      addressGroup?.clearValidators();
+      addressGroup?.get('street')?.clearValidators();
+      addressGroup?.get('city')?.clearValidators();
+      addressGroup?.get('postalCode')?.clearValidators();
+    } else {
+      singleLineControl?.clearValidators();
+      addressGroup?.get('street')?.setValidators([Validators.required, Validators.minLength(3)]);
+      addressGroup?.get('city')?.setValidators([Validators.required, Validators.minLength(2)]);
+      addressGroup?.get('postalCode')?.setValidators([Validators.required, Validators.pattern(/^\d{5}$/)]);
+    }
+
+    singleLineControl?.updateValueAndValidity();
+    addressGroup?.updateValueAndValidity();
+    addressGroup?.get('street')?.updateValueAndValidity();
+    addressGroup?.get('city')?.updateValueAndValidity();
+    addressGroup?.get('postalCode')?.updateValueAndValidity();
   }
 
   private coordinateRangeValidator(type: 'lat' | 'lng') {

@@ -2,9 +2,66 @@
   <form [formGroup]="validationForm" (ngSubmit)="onSubmit()" class="space-y-6">
     <!-- Address Section -->
     <div class="form-section">
-      <h3 class="text-lg font-semibold text-gray-900 mb-4">Dirección</h3>
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold text-gray-900">Dirección</h3>
+        
+        <!-- Toggle buttons -->
+        <div class="flex gap-2 bg-gray-100 rounded-lg p-1">
+          <button
+            type="button"
+            (click)="toggleAddressMode('detailed')"
+            [class]="'px-3 py-1 text-sm font-medium rounded-md transition-colors ' +
+                     (addressMode() === 'detailed'
+                       ? 'bg-white text-gray-900 shadow-sm'
+                       : 'text-gray-600 hover:text-gray-900')"
+          >
+            Detallada
+          </button>
+          <button
+            type="button"
+            (click)="toggleAddressMode('single')"
+            [class]="'px-3 py-1 text-sm font-medium rounded-md transition-colors ' +
+                     (addressMode() === 'single'
+                       ? 'bg-white text-gray-900 shadow-sm'
+                       : 'text-gray-600 hover:text-gray-900')"
+          >
+            Una línea
+          </button>
+        </div>
+      </div>
 
-      <div formGroupName="address" class="space-y-4">
+      <!-- Single Line Address -->
+      @if (addressMode() === 'single') {
+        <div>
+          <label for="singleLineAddress" class="block text-sm font-medium text-gray-700 mb-1">
+            Dirección completa <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            id="singleLineAddress"
+            formControlName="singleLineAddress"
+            placeholder="Ej: Calle Mayor 123, Madrid, 28001, España"
+            [class]="'w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 ' +
+                     (validationForm.get('singleLineAddress')?.invalid && validationForm.get('singleLineAddress')?.touched
+                       ? 'border-red-500 focus:ring-red-500'
+                       : 'border-gray-300 focus:ring-blue-500')"
+          />
+          @if (validationForm.get('singleLineAddress')?.invalid && validationForm.get('singleLineAddress')?.touched) {
+            <p class="mt-1 text-sm text-red-600">
+              @if (validationForm.get('singleLineAddress')?.errors?.['required']) {
+                La dirección es obligatoria
+              }
+              @if (validationForm.get('singleLineAddress')?.errors?.['minlength']) {
+                Mínimo 5 caracteres
+              }
+            </p>
+          }
+        </div>
+      }
+
+      <!-- Detailed Address -->
+      @if (addressMode() === 'detailed') {
+        <div formGroupName="address" class="space-y-4">
         <!-- Street -->
         <div>
           <label for="street" class="block text-sm font-medium text-gray-700 mb-1">
@@ -109,7 +166,8 @@
             <p class="mt-1 text-sm text-red-600">El país es obligatorio</p>
           }
         </div>
-      </div>
+        </div>
+      }
     </div>
 
     <!-- Coordinates Section -->
