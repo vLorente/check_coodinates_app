@@ -86,7 +86,7 @@ export class ValidationFormComponent {
 
   toggleAddressMode(mode: 'detailed' | 'single'): void {
     this.addressMode.set(mode);
-    
+
     // Actualizar validadores según el modo
     const singleLineControl = this.validationForm.get('singleLineAddress');
     const addressGroup = this.validationForm.get('address');
