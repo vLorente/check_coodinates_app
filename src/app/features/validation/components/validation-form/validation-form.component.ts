@@ -1,7 +1,5 @@
 import { Component, output, signal, inject, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ValidationService } from '@core/services/validation.service';
-import { type ValidationRequest } from '@core/models';
 
 @Component({
   selector: 'app-validation-form',
@@ -12,7 +10,6 @@ import { type ValidationRequest } from '@core/models';
 })
 export class ValidationFormComponent {
   private fb = inject(FormBuilder);
-  private validationService = inject(ValidationService);
 
   // Outputs
   onValidationComplete = output<void>();
@@ -47,20 +44,15 @@ export class ValidationFormComponent {
 
       const formValue = this.validationForm.value;
 
-      const request: ValidationRequest = {
-        address: {
-          street: formValue.address?.street || '',
-          city: formValue.address?.city || '',
-          postalCode: formValue.address?.postalCode || '',
-          country: formValue.address?.country || 'España'
-        },
-        coordinates: {
-          latitude: parseFloat(formValue.coordinates?.latitude || '0'),
-          longitude: parseFloat(formValue.coordinates?.longitude || '0')
-        }
-      };
+      // Construir dirección completa para búsqueda en Google Maps
+      const address = `${formValue.address?.street}, ${formValue.address?.city}, ${formValue.address?.postalCode}, ${formValue.address?.country}`;
+      const lat = formValue.coordinates?.latitude || '0';
+      const lng = formValue.coordinates?.longitude || '0';
 
-      await this.validationService.validateCoordinates(request);
+      // Abrir Google Maps con la dirección como origen y las coordenadas como destino
+      const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(address)}&destination=${lat},${lng}&travelmode=driving`;
+
+      window.open(googleMapsUrl, '_blank');
 
       this.onValidationComplete.emit();
       this.validationForm.reset({
@@ -68,7 +60,7 @@ export class ValidationFormComponent {
         coordinates: {}
       });
     } catch (error: any) {
-      this.errorMessage.set(error?.message || 'Error al validar coordenadas');
+      this.errorMessage.set(error?.message || 'Error al abrir Google Maps');
     } finally {
       this.submitting.set(false);
     }
